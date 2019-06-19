@@ -1,7 +1,9 @@
+//未完成!!!!!
+
 import java.io.*;
 import java.util.*;
 
-public class CheckSNS {
+public class CheckSNS2 {
 
 	public static void main(String[] args) {
 

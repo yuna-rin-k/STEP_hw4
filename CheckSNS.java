@@ -17,12 +17,12 @@ public class CheckSNS {
 		ArrayList<Account> route = new ArrayList<>();
 		route.add(startAccount);
 
-		route = findRoute(startAccount, target, accounts.size(), snsConnection, isChecked, route);	
+		route = findRoute(startAccount, target, snsConnection, isChecked, route);	
 		showRoute(route);
 
 	}
 
-	public static ArrayList<Account> findRoute(Account startAccount, Account target, int numberOfAccounts, 
+	public static ArrayList<Account> findRoute(Account startAccount, Account target, 
 							Map<Account, ArrayList<Account>> snsConnection, boolean[] isChecked, ArrayList<Account> route) {
 
 		Queue<Account> q = new ArrayDeque<>();
@@ -41,7 +41,7 @@ public class CheckSNS {
 				if (isChecked[follow.id] == false) {
 					isChecked[follow.id] = true;
 					route.add(follow);
-					route = findRoute(follow, target, numberOfAccounts, snsConnection, isChecked, route);
+					route = findRoute(follow, target, snsConnection, isChecked, route);
 					if (route != null) break;
 				}	
 			} 
