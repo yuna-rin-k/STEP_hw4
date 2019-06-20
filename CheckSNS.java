@@ -8,28 +8,42 @@ public class CheckSNS {
 		ArrayList<Account> accounts = readAccounts("nicknames.txt");
 		SNS sns = new SNS(accounts);
 		Map<Account, ArrayList<Account>> snsConnection = readSnsConnection(sns, "links.txt", accounts.size());
-	
+		sns.setSNSConnection(snsConnection);
+
 		Account startAccount = sns.nicknameKey_accountVal.get("jacob");
 		Account target = sns.nicknameKey_accountVal.get("billy");
 
 		boolean[] isChecked = new boolean[accounts.size()];
 		Arrays.fill(isChecked, false);
-		isChecked[1] = true;
+		isChecked[startAccount.id] = true;
 
 		ArrayList<Account> route = new ArrayList<>();
-		route = findRoute(sns, startAccount, target, snsConnection, isChecked, accounts.size());
+		route = findRoute(sns, startAccount, target);
 
 		showRoute(route);
 
 	}
 
-	public static ArrayList<Account> findRoute(SNS sns, Account startAccount, Account target, 
-							Map<Account, ArrayList<Account>> snsConnection, boolean[] isChecked, int numOfAccount) {
+	public static ArrayList<Account> findRoute(SNS sns, Account startAccount, Account target) {
 
-		Queue<Account> q = new ArrayDeque<>();
+		ArrayList<Account> accounts = sns.getAccountList();
+		Map<Account, ArrayList<Account>> snsConnection = sns.getSNSConnection();
+
+		int numOfAccount = accounts.size();
 		int[] preID = new int[numOfAccount];
 		Arrays.fill(preID, -1);
+		
+		boolean[] isChecked = new boolean[numOfAccount];
+		Arrays.fill(isChecked, false);
+		isChecked[startAccount.id] = true;
 
+		return findRouteBFS(sns, startAccount, target, snsConnection, isChecked, preID);
+	}
+
+	public static ArrayList<Account> findRouteBFS(SNS sns, Account startAccount, Account target, 
+							Map<Account, ArrayList<Account>> snsConnection, boolean[] isChecked, int[] preID) {
+
+		Queue<Account> q = new ArrayDeque<>();
 		q.add(startAccount);
 
 		while (q.size() > 0) {
@@ -63,7 +77,7 @@ public class CheckSNS {
 
 				while (true) {
 					preAccountID = preID[currentAccount.id];
-					preAccount = sns.idKey_accountVal.get(preAccountID);
+					preAccount = sns.getAccountWithID(preAccountID);
 					if (preAccount.equals(startAccount)){
 						route.add(preAccount);
 						break;
@@ -105,8 +119,8 @@ public class CheckSNS {
 				int from = links.nextInt();
 				int to = links.nextInt();
 
-				Account fromAccount = sns.idKey_accountVal.get(from);
-				Account toAccount = sns.idKey_accountVal.get(to);
+				Account fromAccount = sns.getAccountWithID(from);
+				Account toAccount = sns.getAccountWithID(to);
 				ArrayList<Account> toArray;
 				if (snsConnection.containsKey(fromAccount)) toArray = snsConnection.get(fromAccount);
 				else toArray = new ArrayList<>();
@@ -117,6 +131,8 @@ public class CheckSNS {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
+
+		sns.setSNSConnection(snsConnection);
 
 		return snsConnection;	 
 	}
@@ -134,8 +150,6 @@ public class CheckSNS {
 
 	static class Account {
 
-		//static Map<Integer, Account> idKey_accountVal = new HashMap<>();
-		//static Map<String, Account> nameKey_accountVal = new HashMap<>();
 		int id;
 		String nickname;
 
@@ -143,16 +157,15 @@ public class CheckSNS {
 
 			this.id = id;
 			this.nickname = nickname;
-			//idKey_accountVal.put(id, this);
-			//nameKey_accountVal.put(nickname, this);
 		}
 	}
 
 	static class SNS {
 
-		ArrayList<Account> accountList = new ArrayList<>();
-		Map<Integer, Account> idKey_accountVal = new HashMap<>();
-		Map<String, Account> nicknameKey_accountVal = new HashMap<>();
+		private ArrayList<Account> accountList = new ArrayList<>();
+		private Map<Account, ArrayList<Account>> snsConnection;
+		private Map<Integer, Account> idKey_accountVal = new HashMap<>();
+		private Map<String, Account> nicknameKey_accountVal = new HashMap<>();
 
 		public SNS(ArrayList<Account> accountList) {
 			this.accountList = accountList;
@@ -180,5 +193,29 @@ public class CheckSNS {
 			}
 		}
 
+		public ArrayList<Account> getAccountList() {
+
+			return this.accountList;
+		}
+
+		public Map<Account, ArrayList<Account>> getSNSConnection() {
+
+			return this.snsConnection;
+		}
+
+		public Account getAccountWithID(int id) {
+
+			return this.idKey_accountVal.get(id);
+		}
+
+		public Account getAccountWithNickname(String nickName) {
+
+			return this.nicknameKey_accountVal.get(nickName);
+		}
+
+		public void setSNSConnection(Map<Account, ArrayList<Account>> snsConnection) {
+
+			this.snsConnection = snsConnection;
+		}
 	}
 }
