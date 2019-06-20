@@ -189,27 +189,22 @@ public class CheckSNS {
 		}
 
 		public ArrayList<Account> getAccountList() {
-
 			return this.accountList;
 		}
 
 		public Map<Account, ArrayList<Account>> getSNSConnection() {
-
 			return this.snsConnection;
 		}
 
 		public Account getAccountWithID(int id) {
-
 			return this.idKey_accountVal.get(id);
 		}
 
 		public Account getAccountWithNickname(String nickName) {
-
 			return this.nicknameKey_accountVal.get(nickName);
 		}
 
 		public void setSNSConnection(Map<Account, ArrayList<Account>> snsConnection) {
-
 			this.snsConnection = snsConnection;
 		}
 	}
