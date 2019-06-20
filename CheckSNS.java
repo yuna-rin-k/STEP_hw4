@@ -8,7 +8,6 @@ public class CheckSNS {
 		ArrayList<Account> accounts = readAccounts("nicknames.txt");
 		SNS sns = new SNS(accounts);
 		Map<Account, ArrayList<Account>> snsConnection = readSnsConnection(sns, "links.txt", accounts.size());
-		sns.setSNSConnection(snsConnection);
 
 		Account startAccount = sns.nicknameKey_accountVal.get("jacob");
 		Account target = sns.nicknameKey_accountVal.get("billy");
