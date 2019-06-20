@@ -8,35 +8,28 @@ public class CheckSNS_DFS {
 	public static void main(String[] args) {
 
 		ArrayList<Account> accounts = readAccounts("nicknames.txt");
-		int[][] snsConnections = readSnsConnections("test.txt", accounts.size());
-		//snsConnections[from][to] = 1　→　fromさんがtoさんをフォローしている
-		//snsConnections[from][to] = 0　→　fromさんがtoさんをフォローしていない
+		Map<Account, ArrayList<Account>> snsConnection = readSnsConnection("links.txt", accounts.size());
 
-		int[][] isChecked = new int[accounts.size()][accounts.size()];
-		fillArrayWithInt(isChecked, 0);	//0　→　未チェック , 1　→　チェック済み
-		int startAccount = Account.getID("jacob");
-		int target = Account.getID("billy");
+		boolean[] isChecked = new boolean[accounts.size()];
+		Arrays.fill(isChecked, false);		
+		
+		Account startAccount = Account.nameKey_accountVal.get("jacob");
+		Account target = Account.nameKey_accountVal.get("billy");
 
-		//int shotestStep = findStepDFS(snsConnections, isChecked, startAccount, target, 0);
-		int shotestStep = findStepDFS(snsConnections, isChecked, 0, 3);
+		int shotestStep = findStepDFS(snsConnections, isChecked, startAccount, target);
 		System.out.println("shotestSTEP:"+shotestStep);
 	}
 
-	static int findStepDFS(int[][] connections, int[][] isChecked, int from, int target) {
+	static ArrayList<Account> findRoute(Map<Account, ArrayList<Account>> snsConnection, boolean[] isChecked, 
+												Account account, Account target, ArrayList<Account> route, ArrayList<Account> bestRoute) {
 
-		if (from == target) {
-			return 0;
+		if (account == target) {
+			Arrays.fill(isChecked, false);
+			if (bestRoute.size() > route.size() || bestRoute.size() == 0) bestRoute = route;
+			return route;
 		}
 
-		int shotestStep = Integer.MAX_VALUE;
-		int step = -1;
-		for (int i = 0; i < connections.length; i++) {
-			if (connections[from][i] == 1 && isChecked[from][i] == 0) {
-				isChecked[from][i] = 1;
-				step = findStepDFS(connections, isChecked, i, target);
-				if (step != -1 && step+1 < shotestStep) shotestStep = step+1;	
-			}
-		}
+
 		return shotestStep;
 	}
 
@@ -58,51 +51,46 @@ public class CheckSNS_DFS {
 		return accounts;		 
 	}
 
-	static int[][] readSnsConnections(String textName, int numberOfAccounts) {
+	static Map<Account, ArrayList<Account>> readSnsConnection(String textName, int numberOfAccounts) {
 
-		int[][] snsConnections = new int[numberOfAccounts][numberOfAccounts];
-		fillArrayWithInt(snsConnections, 0);
-
+		Map<Account, ArrayList<Account>> snsConnection = new HashMap<>();
+		
 		try {
 			Scanner links = new Scanner(new File(textName));
 			while (links.hasNext()) {
+
 				int from = links.nextInt();
 				int to = links.nextInt();
-				snsConnections[from][to] = 1;			
+
+				Account fromAccount = Account.idKey_accountVal.get(from);
+				Account toAccount = Account.idKey_accountVal.get(to);
+				ArrayList<Account> toArray;
+				if (snsConnection.containsKey(fromAccount)) toArray = snsConnection.get(fromAccount);
+				else toArray = new ArrayList<>();
+
+				toArray.add(toAccount);
+				snsConnection.put(fromAccount, toArray);
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 
-		return snsConnections;	 
-	}
-
-	static void fillArrayWithInt(int[][] array, int x) {
-
-		for (int i = 0 ; i < array[0].length; i++) {
-			for (int j = 0; j < array[1].length; j++) {
-				array[i][j] = x;
-			}
-		}
+		return snsConnection;	 
 	}
 
 	static class Account {
 
-		static Map<String, Integer> idKey_nameValue = new HashMap<>();
-		String nickName;
+		static Map<Integer, Account> idKey_accountVal = new HashMap<>();
+		static Map<String, Account> nameKey_accountVal = new HashMap<>();
 		int id;
+		String nickname;
 
-		public Account(String nickName, int id) {
+		public Account(int id, String nickname) {
 
-			this.nickName = nickName;
 			this.id = id;
-			idKey_nameValue.put(nickName, id);
-		}
-
-		static int getID(String nickName) {
-
-			if (idKey_nameValue.containsKey(nickName)) return idKey_nameValue.get(nickName);
-			return -1;
+			this.nickname = nickname;
+			idKey_accountVal.put(id, this);
+			nameKey_accountVal.put(nickname, this);
 		}
 	}
 }
