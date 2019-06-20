@@ -13,12 +13,7 @@ public class CheckSNS {
 		Account startAccount = sns.nicknameKey_accountVal.get("jacob");
 		Account target = sns.nicknameKey_accountVal.get("billy");
 
-		boolean[] isChecked = new boolean[accounts.size()];
-		Arrays.fill(isChecked, false);
-		isChecked[startAccount.id] = true;
-
-		ArrayList<Account> route = new ArrayList<>();
-		route = findRoute(sns, startAccount, target);
+		ArrayList<Account> route = findRoute(sns, startAccount, target);
 
 		showRoute(route);
 
@@ -32,7 +27,7 @@ public class CheckSNS {
 		int numOfAccount = accounts.size();
 		int[] preID = new int[numOfAccount];
 		Arrays.fill(preID, -1);
-		
+
 		boolean[] isChecked = new boolean[numOfAccount];
 		Arrays.fill(isChecked, false);
 		isChecked[startAccount.id] = true;
@@ -54,7 +49,7 @@ public class CheckSNS {
 				break;
 
 			if (!snsConnection.containsKey(account)) 
-				return null;
+				break;
 
 			ArrayList<Account> follows = snsConnection.get(account);
 			for (int i = 0; i < follows.size(); i++) {
