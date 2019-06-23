@@ -15,7 +15,7 @@ public class CheckSNS {
 
 		ArrayList<Account> route = findRoute(sns, startAccount, target);
 
-		showRoute(route);
+		printRoute(route);
 
 	}
 
@@ -129,7 +129,7 @@ public class CheckSNS {
 		return snsConnection;	 
 	}
 
-	static void showRoute(ArrayList<Account> route) {
+	static void printRoute(ArrayList<Account> route) {
 
 		System.out.println("step:" + (route.size()-1));
 
